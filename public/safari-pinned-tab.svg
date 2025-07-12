@@ -1,0 +1,21 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brain/Neural network representation in monochrome -->
+  <g fill="currentColor">
+    <!-- Central node -->
+    <circle cx="8" cy="8" r="1.5"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="6" cy="6" r="0.75"/>
+    <circle cx="10" cy="6" r="0.75"/>
+    <circle cx="6" cy="10" r="0.75"/>
+    <circle cx="10" cy="10" r="0.75"/>
+  </g>
+  
+  <!-- Neural connections -->
+  <path d="M7.25 7.25 L5.75 5.75 M8.75 7.25 L10.25 5.75 M7.25 8.75 L5.75 10.25 M8.75 8.75 L10.25 10.25" 
+        stroke="currentColor" stroke-width="0.5" stroke-linecap="round"/>
+  
+  <!-- Central connections -->
+  <path d="M8 6.5 L8 9.5 M6.5 8 L9.5 8" 
+        stroke="currentColor" stroke-width="0.75" stroke-linecap="round"/>
+</svg> 
