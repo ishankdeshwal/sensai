@@ -9,7 +9,7 @@ import { Toaster } from "sonner";
 
 const inter=Inter({subsets:["latin"]})
 export const metadata = {
-  title: "Sensai",
+  title: "CarrerGenie",
   description: "AI-powered career development platform. Build better resumes, craft compelling cover letters, and ace your interviews with personalized insights.",
   keywords: ["AI", "career", "resume", "cover letter", "interview", "professional development"],
   authors: [{ name: "Sensai Team" }],
