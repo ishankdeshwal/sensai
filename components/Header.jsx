@@ -13,12 +13,11 @@ import { checkUser } from '@/lib/checkUser'
      <header className='fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-background/60'>
       <nav className='container mx-auto md:px-15 h-16 flex items-center justify-between'>
         <Link href='/'>
-        <Image src='/logo.png'
-                alt='"Sesai Logo'
-                width={200}
-                height={60}
-                className='h-12 py-1 w-auto object-contain'
-           />
+      <div className="h-12 py-1 w-auto text-white font-bold text-2xl flex items-center">
+  <span>CarrerGen</span>
+  <span className="bg-gradient-to-r from-cyan-400 to-blue-700 text-transparent bg-clip-text">ie</span>
+</div>
+
         </Link>
         <div className='flex items-center space-x-2 md:space-x-4'>
           <SignedIn>
