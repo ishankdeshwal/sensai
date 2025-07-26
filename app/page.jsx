@@ -289,7 +289,7 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
-            className="fixed  bottom-20  right-15 z-50 w-[50%] md:w-[500px] "
+            className="fixed  bottom-20  right-15 z-50 w-[80%] md:w-[500px] "
           >
             <Card className='border-2'>
               <CardHeader className='flex flex-row space-y-0 pb-3 items-center justify-between'>
