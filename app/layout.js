@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ChatBot from "@/components/ChatBot";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { Toaster } from "sonner";
@@ -81,6 +82,7 @@ export default function RootLayout({ children }) {
             </main>
             <Toaster richColors />
             <Footer />
+            <ChatBot />
           </ThemeProvider>
       </body>
     </html>
