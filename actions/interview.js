@@ -3,19 +3,23 @@
 import { auth } from "@clerk/nextjs/server";
 import db from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
 });
+
 export async function generateQuiz() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+  
   const user = await db.user.findUnique({
     where: {
       clerkUserId: userId,
     },
   });
   if (!user) throw new Error("user not Found");
+  
   try {
     const prompt = `
     Generate 10 technical interview questions for a ${
@@ -38,6 +42,7 @@ export async function generateQuiz() {
       ]
     }
   `;
+
     const res = await model.generateContent(prompt);
     const response = res.response;
     const text = response.text();
@@ -48,18 +53,24 @@ export async function generateQuiz() {
     return quiz.questions;
   } catch (error) {
     console.error("Error generating quiz:", error);
-    throw new Error("Failed to generate quiz questions");
+    if (error.message.includes("API_KEY")) {
+      throw new Error("Invalid or missing Gemini API key. Please check your environment variables.");
+    }
+    throw new Error("Failed to generate quiz questions. Please try again.");
   }
 }
+
 export async function saveQuizResult(questions, answer, score) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
+  
   const user = await db.user.findUnique({
     where: {
       clerkUserId: userId,
     },
   });
   if (!user) throw new Error("user not Found");
+  
   const quesRes = questions.map((q, index) => ({
     questions: q.question,
     answer: q.correctAnswer,
@@ -67,8 +78,10 @@ export async function saveQuizResult(questions, answer, score) {
     isCorrect: q.correctAnswer === answer[index],
     explanation: q.explanation,
   }));
+  
   const wrongAns = quesRes.filter((q) => !q.isCorrect);
-  let improvementTip=null
+  let improvementTip = null;
+  
   if (wrongAns.length > 0) {
     const wrongQuesText = wrongAns
       .map(
@@ -76,6 +89,7 @@ export async function saveQuizResult(questions, answer, score) {
           `Question: "${q.question}"\nCorrect Answer:"${q.answer}"\nUser Answer:"${q.userAnswer}"`
       )
       .join("\n\n");
+      
     const improvementPrompt = `
       The user got the following ${user.industry} technical interview questions wrong:
 
@@ -86,32 +100,34 @@ export async function saveQuizResult(questions, answer, score) {
       Keep the response under 2 sentences and make it encouraging.
       Don't explicitly mention the mistakes, instead focus on what to learn/practice.
     `;
-   try {
-     const res=await model.generateContent(improvementPrompt)
-    const response=res.response;
-    improvementTip=response.text().trim()
-   } catch (error) {
-    console.log("Error generating improvement Tip:",error);
-   }
+    
+    try {
+      const res = await model.generateContent(improvementPrompt);
+      const response = res.response;
+      improvementTip = response.text().trim();
+    } catch (error) {
+      console.log("Error generating improvement Tip:", error);
+      improvementTip = "Focus on practicing more questions in this area to improve your skills.";
+    }
+  }
 
-   try {
-    const assessment=await db.assessment.create({
-      data:{
-        userId:user.id,
-        quizScore:score,
-        questions:quesRes,
-        category:"Technical",
-        improvementTip
-      }
-    })
-    return assessment
-   } catch (error) {
-    console.error("Error saving quiz result:",error);
-    throw new Error("Failed to save quiz result")
-   }
-
+  try {
+    const assessment = await db.assessment.create({
+      data: {
+        userId: user.id,
+        quizScore: score,
+        questions: quesRes,
+        category: "Technical",
+        improvementTip,
+      },
+    });
+    return assessment;
+  } catch (error) {
+    console.error("Error saving quiz result:", error);
+    throw new Error("Failed to save quiz result");
   }
 }
+
 export async function getAssessments(){
    const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");

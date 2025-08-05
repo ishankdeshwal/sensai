@@ -1,12 +1,15 @@
-"use server"
+"use server";
+
 import { auth } from "@clerk/nextjs/server";
 import db from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",
 });
+
 export async function saveResume(content){
     const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -78,10 +81,9 @@ export async function improveWithAI({current,type,title,organization}){
     Format the response as a single paragraph without any additional text or explanations.
   `;
   try {
-    const result=await model.generateContent(prompt);
-    const res=result.response
-    const improvedContent=res.text().trim()
-    return improvedContent
+    const response = await model.generateContent(prompt);
+    const improvedContent = response.response.text();
+    return improvedContent;
   } catch (error) {
     console.error("Error improving content",error)
     // Instead of throwing an error, return the original content

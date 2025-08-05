@@ -6,7 +6,6 @@ import { onboardingSchema } from "@/app/lib/schema";
 import { useRouter } from "next/navigation";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -29,12 +28,17 @@ import userFetch from "@/hooks/user-fetch";
 import { updateUser } from "@/actions/user";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+
 const OnboardingForm = () => {
   const [selectIndustry, setSelectIndustry] = useState(null);
   const router = useRouter();
- const{loading:updateLoading,
-  fn:updateUserFn,
-  data:updateResult}= userFetch(updateUser)
+  
+  const {
+    loading: updateLoading,
+    fn: updateUserFn,
+    data: updateResult
+  } = userFetch(updateUser);
+  
   const {
     register,
     handleSubmit,
@@ -44,43 +48,46 @@ const OnboardingForm = () => {
   } = useForm({
     resolver: zodResolver(onboardingSchema),
   });
+  
   const watchIndustry = watch("industry");
+  
   const onSubmit = async (values) => {
- try {
-    const formattedIndustry=`${values.industry}-${values.subIndustry.toLowerCase().replace(/ /g,"-")}`
-    await updateUserFn({
-      ...values,
-      industry:formattedIndustry
-    })
- } catch (error) {
-  console.log("onbarding error:",error);
- }
-  };
-  useEffect(()=>{
-    if(updateResult?.success && !updateLoading){
-      toast.success("Profile Completed Successfully")
-      router.push("/dashboard")
-      router.refresh()
+    try {
+      const formattedIndustry = `${values.industry}-${values.subIndustry.toLowerCase().replace(/ /g, "-")}`;
+      await updateUserFn({
+        ...values,
+        industry: formattedIndustry
+      });
+    } catch (error) {
+      console.log("onboarding error:", error);
     }
-  },[updateResult,updateLoading])
+  };
+  
+  useEffect(() => {
+    if (updateResult?.success && !updateLoading) {
+      toast.success("Profile Completed Successfully");
+      router.push("/dashboard");
+      router.refresh();
+    }
+  }, [updateResult, updateLoading]);
+  
   return (
-    <div className="flex  items-center justify-center bg-background">
-      <Card className="w-full max-w-xl mt-10 mx-2">
+    <div className="flex items-center justify-center bg-background min-h-screen">
+      <Card className="w-full max-w-xl mx-4">
         <CardHeader>
-          <CardTitle className="text-gray-300 text-4xl">
+          <CardTitle className="text-4xl font-bold text-center">
             Complete your profile
           </CardTitle>
-          <CardDescription>
-            Select your industry to get personalised carrer insights and
-            recommendations
+          <CardDescription className="text-center">
+            Select your industry to get personalized career insights and recommendations
           </CardDescription>
-          <CardAction>Card Action</CardAction>
         </CardHeader>
+        
         <CardContent>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Industry */}
-            <div className="space-y-4">
-              <Label htmlFor="industry">Industry</Label>
+            <div className="space-y-2">
+              <Label htmlFor="industry">Industry *</Label>
               <Select
                 onValueChange={(value) => {
                   setValue("industry", value);
@@ -89,7 +96,7 @@ const OnboardingForm = () => {
                   setValue("subIndustry", "");
                 }}
               >
-                <SelectTrigger id="industry" className="w-[280px]">
+                <SelectTrigger id="industry">
                   <SelectValue placeholder="Select an Industry" />
                 </SelectTrigger>
                 <SelectContent>
@@ -106,15 +113,16 @@ const OnboardingForm = () => {
                 </p>
               )}
             </div>
-            {/* Subindustry */}
+            
+            {/* Sub Industry */}
             {watchIndustry && (
-              <div className="space-y-4  mt-4">
-                <Label htmlFor="subIndustry"> Sub Industry</Label>
+              <div className="space-y-2">
+                <Label htmlFor="subIndustry">Sub Industry *</Label>
                 <Select
                   onValueChange={(value) => setValue("subIndustry", value)}
                   disabled={!selectIndustry}
                 >
-                  <SelectTrigger id="subIndustry" className="w-[280px]">
+                  <SelectTrigger id="subIndustry">
                     <SelectValue placeholder="Select a Sub Industry" />
                   </SelectTrigger>
                   <SelectContent>
@@ -132,9 +140,10 @@ const OnboardingForm = () => {
                 )}
               </div>
             )}
+            
             {/* Experience */}
             <div className="space-y-2">
-              <Label htmlFor="experience">Years Of Experience</Label>
+              <Label htmlFor="experience">Years of Experience *</Label>
               <Input
                 id="experience"
                 type="number"
@@ -149,16 +158,17 @@ const OnboardingForm = () => {
                 </p>
               )}
             </div>
-            {/*Skills  */}
-              <div className="space-y-2">
+            
+            {/* Skills */}
+            <div className="space-y-2">
               <Label htmlFor="skills">Skills</Label>
               <Input
                 id="skills"
-                placeholder="eg. python.javascript,project Management"
+                placeholder="e.g., Python, JavaScript, Project Management"
                 {...register("skills")}
               />
               <p className="text-sm text-muted-foreground">
-                Seprate Multiple Skills with commas
+                Separate multiple skills with commas
               </p>
               {errors.skills && (
                 <p className="text-sm text-red-500">
@@ -166,12 +176,13 @@ const OnboardingForm = () => {
                 </p>
               )}
             </div>
-             {/*Bio  */}
-              <div className="space-y-2">
-              <Label htmlFor="bio">Proffessional Bio</Label>
+            
+            {/* Bio */}
+            <div className="space-y-2">
+              <Label htmlFor="bio">Professional Bio</Label>
               <Textarea
-                id="skills"
-                placeholder="Tell us about your proffesional background"
+                id="bio"
+                placeholder="Tell us about your professional background"
                 {...register("bio")}
               />
               {errors.bio && (
@@ -180,20 +191,24 @@ const OnboardingForm = () => {
                 </p>
               )}
             </div>
-            <Button type="submit" disabled={updateLoading} className='w-full'>
-             {updateLoading?(
-              <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-              </>
-             ):(
-              " Complete Profile"
-             )}
+            
+            <Button type="submit" disabled={updateLoading} className="w-full">
+              {updateLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Complete Profile"
+              )}
             </Button>
           </form>
         </CardContent>
-        <CardFooter>
-          <p>Card Footer</p>
+        
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground text-center">
+            This information helps us provide personalized career insights and AI recommendations
+          </p>
         </CardFooter>
       </Card>
     </div>

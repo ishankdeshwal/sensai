@@ -31,7 +31,7 @@ model User {
 
   assessments Assessment[]
   resume      Resume?
-  coverLetter CoverLetter[]
+  coverLetters CoverLetter[]
 }
 
 model Assessment {
@@ -60,7 +60,7 @@ model Resume {
 
 model CoverLetter {
   id             String   @id @default(cuid())
-  userId         String   @unique
+  userId         String
   user           User     @relation(fields: [userId], references: [id])
   content        String
   jobDescription String?

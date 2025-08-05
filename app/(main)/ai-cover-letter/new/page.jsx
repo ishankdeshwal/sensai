@@ -2,8 +2,16 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CoverLetterGenerator from "../_components/CoverLettergenerator";
+import { getUserOnboardingStatus } from "@/actions/user";
+import { redirect } from "next/navigation";
 
-export default function NewCoverLetterPage() {
+export default async function NewCoverLetterPage() {
+  const { isOnboarded } = await getUserOnboardingStatus();
+  
+  if (!isOnboarded) {
+    redirect("/onboarding");
+  }
+
   return (
     <div className="px-15 container mx-auto py-6">
       <div className="flex flex-col space-y-2">

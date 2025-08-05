@@ -19,11 +19,16 @@ export async function generateCoverLetter(data) {
 
   // Validate that user has required profile information
   if (!user.industry) {
-    throw new Error("Please complete your profile with industry information first");
+    throw new Error("Please complete your profile with industry information first. Go to your profile settings to add your industry.");
   }
 
   if (!user.experience && user.experience !== 0) {
-    throw new Error("Please complete your profile with experience information first");
+    throw new Error("Please complete your profile with experience information first. Go to your profile settings to add your experience.");
+  }
+
+  // Validate input data
+  if (!data.jobTitle || !data.companyName || !data.jobDescription) {
+    throw new Error("Please provide all required information: job title, company name, and job description");
   }
 
   const prompt = `
@@ -32,10 +37,10 @@ export async function generateCoverLetter(data) {
   }.
     
     About the candidate:
-    - Industry: ${user.industry}
-    - Years of Experience: ${user.experience}
-    - Skills: ${user.skills?.join(", ")}
-    - Professional Background: ${user.bio}
+    - Industry: ${user.industry || "Not specified"}
+    - Years of Experience: ${user.experience || 0}
+    - Skills: ${user.skills?.join(", ") || "Not specified"}
+    - Professional Background: ${user.bio || "Not specified"}
     
     Job Description:
     ${data.jobDescription}
@@ -53,8 +58,8 @@ export async function generateCoverLetter(data) {
   `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const content = result.response.text().trim();
+    const response = await model.generateContent(prompt);
+    const content = response.response.text();
 
     if (!content) {
       throw new Error("AI failed to generate content");

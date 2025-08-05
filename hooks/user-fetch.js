@@ -1,7 +1,5 @@
-import { useFormState } from "react-hook-form"
+import { useState } from "react"
 import { toast } from "sonner"
-
-const { useState } = require("react")
 
 const userFetch=(cb)=>{
 const [data,setData]=useState(null)
@@ -16,8 +14,12 @@ try {
     setError(null)
 
 } catch (error) {
+    console.error("userFetch error:", error);
     setError(error)
-    toast.error(error.message)
+    // Only show toast for client-side errors, not server component errors
+    if (typeof window !== 'undefined') {
+        toast.error(error.message || "An error occurred")
+    }
 }finally{
     setLoading(false)
 }
